@@ -23,7 +23,6 @@ pub struct MyApp{
     pub tx: Sender<String>,
     pub rx: Receiver<String>,
 
-    pub style: Style,
     pub url: String,
     types: Types,
     response_body: Option<Result<String, String>>
