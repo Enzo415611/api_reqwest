@@ -1,13 +1,13 @@
 mod ui;
-mod test;
 mod methods_http;
 
 use std::sync::mpsc::{Receiver, Sender};
 use eframe::{NativeOptions, App};
-use egui::Style;
+use serde_json::Value;
 
 #[tokio::main]
 async fn main() -> Result<(), eframe::Error> {
+
     eframe::run_native(
         "reqwest",
         NativeOptions::default(),
@@ -22,10 +22,13 @@ pub struct MyApp{
     // comunicação entre threads
     pub tx: Sender<String>,
     pub rx: Receiver<String>,
-
+    
+    
+    pub input_body_str: String,
+    pub body: Value,
+    pub method_is_active: Types,
     pub url: String,
-    types: Types,
-    response_body: Option<Result<String, String>>
+    response_body: Option<Result<String, String>>,
 }
 
 #[derive(PartialEq)]
