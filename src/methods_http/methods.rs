@@ -8,6 +8,7 @@ impl MyApp {
             Types::Get => self.method_get(),
             Types::Post => self.method_post(),
             Types::Delete => self.method_delete(),
+            Types::Put => self.method_put(),
         }
     }
 
@@ -103,6 +104,30 @@ impl MyApp {
                     Err(e) => Err(format!("Erro ao enviar o json a api: {}", e))
                 };
 
+            tx.send(resp.expect("Erro ao enviar a resposta entre threads")).unwrap();
+        });
+    }
+
+     fn method_put(&mut self){
+        let client = Client::new();
+        self.body = self.convert_json();
+
+        // clone
+        let url_clone = self.url.clone();
+        let tx = self.tx.clone();
+        let clone_body = self.body.clone();
+
+        tokio::spawn(async move {
+            let resp =
+                match client.put(&url_clone)
+                    .json(&clone_body)
+                    .send()
+                    .await
+                    .unwrap()
+                    .text().await {
+                    Ok(respo) => Ok(respo),
+                    Err(e) => Err(format!("Erro ao enviar o json a api: {}",e))
+                };
             tx.send(resp.expect("Erro ao enviar a resposta entre threads")).unwrap();
         });
     }

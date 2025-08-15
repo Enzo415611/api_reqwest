@@ -36,5 +36,6 @@ pub enum Types{
     Get,
     Post,
     Delete,
+    Put,
 }
 

@@ -48,6 +48,9 @@ impl App for MyApp {
                     if ui.button(RichText::new("Delete").size(15.0)).clicked(){
                         self.method_is_active = Types::Delete;
                     }
+                    if ui.button(RichText::new("Put").size(15.0)).clicked(){
+                        self.method_is_active = Types::Put;
+                    }
                 });
                 ui.label(RichText::new("URL").size(15.0));
                 ui.add_sized([600.0, 30.0], TextEdit::singleline(&mut self.url));
