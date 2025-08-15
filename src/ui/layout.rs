@@ -60,7 +60,7 @@ impl App for MyApp {
                     let tx = self.tx.clone();
                     let url_to_fetch = self.url.clone();
                     self.verifier_method();
-                    self.response_body = Some(Ok("Erro...".to_string()));
+                    self.response_body = Some(Ok("Err".to_string()));
                 }
                 if let Some(result) = &self.response_body {
                     match result {
