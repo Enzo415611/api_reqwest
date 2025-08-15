@@ -7,9 +7,28 @@ impl MyApp {
         match self.method_is_active {
             Types::Get => self.method_get(),
             Types::Post => self.method_post(),
+            Types::Delete => self.method_delete(),
         }
     }
 
+    pub fn convert_json(&self) -> Value{
+        let convert_json: Value =
+            match from_str(&*self.input_body_str) {
+                Ok(resp) => {resp},
+                Err(e) => {
+                    match from_str(format!("erro ao converter: {}",e ).as_str()) {
+                        Ok(r) => {
+                            r
+                        },
+                        Err(e) => {
+                            Value::Null
+                        }
+                    }
+
+                },
+            };
+        convert_json
+    }
 
     pub fn method_get(&mut self) {
         // clone da variavel tx usada para enviar mensagem entre threads
@@ -40,22 +59,7 @@ impl MyApp {
     }
 
     pub fn method_post(&mut self) {
-        let convert_json: Value =
-            match from_str(&*self.input_body_str) {
-                Ok(resp) => {resp},
-                Err(e) => {
-                    match from_str(format!("erro ao converter: {}",e ).as_str()) {
-                        Ok(r) => {
-                            r
-                        },
-                        Err(e) => {
-                            Value::Null
-                        }
-                    }
-
-                },
-            };
-        self.body = convert_json;
+        self.body = self.convert_json();
         let client = Client::new();
 
         // clone
@@ -75,7 +79,31 @@ impl MyApp {
                     Err(e) => Err(format!("Erro ao enviar o json a api: {}", e))
                 };
 
-            tx.send(resp.expect("Erro ao enviar a resposta")).unwrap();
+            tx.send(resp.expect("Erro ao enviar a resposta entre threads")).unwrap();
+        });
+    }
+
+    pub fn method_delete(&mut self){
+        let client = Client::new();
+        self.body = self.convert_json();
+        // clone
+        let url_clone = self.url.clone();
+        let mut clone_body = self.body.clone();
+        let tx = self.tx.clone();
+
+        tokio::spawn(async move {
+            let resp =
+                match client.delete(&url_clone)
+                    .json(&clone_body)
+                    .send()
+                    .await
+                    .unwrap()
+                    .text().await {
+                    Ok(respo) => Ok(respo),
+                    Err(e) => Err(format!("Erro ao enviar o json a api: {}", e))
+                };
+
+            tx.send(resp.expect("Erro ao enviar a resposta entre threads")).unwrap();
         });
     }
 }

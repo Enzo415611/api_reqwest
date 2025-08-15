@@ -34,6 +34,7 @@ pub struct MyApp{
 #[derive(PartialEq)]
 pub enum Types{
     Get,
-    Post
+    Post,
+    Delete,
 }
 
