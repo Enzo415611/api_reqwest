@@ -1,6 +1,6 @@
 use std::sync::mpsc::{channel};
 use eframe::{App, Frame};
-use egui::{vec2, Color32, Context, TextEdit, FontDefinitions, Visuals, RichText};
+use egui::{vec2, Color32, Context, TextEdit, Visuals, RichText, TextStyle, FontId, FontFamily};
 use serde_json::{Value};
 use crate::{MyApp, Types};
 
@@ -24,6 +24,7 @@ impl Default for MyApp {
 impl App for MyApp {
     fn update(&mut self, ctx: &Context, _frame: &mut Frame) {
         let mut visuals = Visuals::dark();
+        let mut style = (*ctx.style()).clone();
         match self.rx.try_recv() {
             Ok(result) => {
                 self.response_body = Some(Ok(result));
@@ -31,6 +32,14 @@ impl App for MyApp {
             Err(_) => {}
         }
 
+        style.text_styles = [
+            (TextStyle::Heading, FontId::new(30.0, FontFamily::Proportional)),
+            (TextStyle::Body, FontId::new(22.0, FontFamily::Proportional)),
+            (TextStyle::Monospace, FontId::new(20.0, FontFamily::Monospace)), // usado no code_editor
+            (TextStyle::Button, FontId::new(20.0, FontFamily::Proportional)),
+            (TextStyle::Small, FontId::new(15.0, FontFamily::Proportional)),
+        ].into();
+        ctx.set_style(style);
 
         egui::CentralPanel::default().show(&ctx, |ui| {
             ui.style_mut().spacing.item_spacing = vec2(15.0,15.0);
