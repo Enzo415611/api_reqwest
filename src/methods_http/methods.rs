@@ -65,7 +65,7 @@ impl MyApp {
 
         // clone
         let url_clone = self.url.clone();
-        let mut clone_body = self.body.clone();
+        let clone_body = self.body.clone();
         let tx = self.tx.clone();
 
         tokio::spawn(async move {
@@ -89,7 +89,7 @@ impl MyApp {
         self.body = self.convert_json();
         // clone
         let url_clone = self.url.clone();
-        let mut clone_body = self.body.clone();
+        let clone_body = self.body.clone();
         let tx = self.tx.clone();
 
         tokio::spawn(async move {
